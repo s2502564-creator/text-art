@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My SVG Animation Project</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #eeeeee;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: #333333;
+        }
+
+        p {
+            color: #555555;
+        }
+
+        .animation {
+            width: 300px;
+            height: 300px;
+            margin: 25px auto;
+            border: 2px solid #cccccc;
+            background-color: white;
+        }
+
+        object {
+            width: 300px;
+            height: 300px;
+        }
+
+        a {
+            color: #2196f3;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>My SVG Animation Project</h1>
+
+    <p>Animated Bouncing Ball using SVG</p>
+
+    <!-- SVG Animation -->
+    <div class="animation">
+        <object
+            data="SVG/bouncing-ball.svg"
+            type="image/svg+xml"
+            width="300"
+            height="300">
+        </object>
+    </div>
+
+    <!-- Link to SVG File -->
+    <p>
+        <a href="SVG/bouncing-ball.svg" target="_blank">
+            View SVG File
+        </a>
+    </p>
+
+    <p>Created for my SVG Animation Activity</p>
+
+</body>
+</html>
