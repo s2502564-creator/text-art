@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML5 Canvas Art</title>
+<style>
+  body { margin:0; padding:32px 20px 48px; background:#FBF8F7; color:#2b2f3a; font-family:Georgia, "Times New Roman", serif; }
+  header { max-width:960px; margin:0 auto 28px; }
+  h1 { margin:0 0 6px; font-size:1.8rem; }
+  p { margin:0; }
+  a { color:#1B6CA8; }
+  a:focus-visible { outline:3px solid #FFD166; outline-offset:2px; }
+  .gallery { max-width:960px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, max-content)); gap:28px 24px; justify-content:center; }
+  figure { margin:0; width:200px; }
+  canvas { display:block; width:200px; height:200px; border-radius:12px; }
+  figcaption { margin-top:8px; font-size:.9rem; font-weight:bold; text-align:center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>HTML5 Canvas Art</h1>
+  <p>Eight 200 &times; 200 drawings made with Canvas paths, arcs, curves, clipping and transforms. <a href="../index.html">Back to homepage</a></p>
+</header>
+<main class="gallery" id="gallery"></main>
+
+<script>
+/* ---------- helpers ---------- */
+function bg(c, color) { c.fillStyle = color; c.fillRect(0, 0, 200, 200); }
+function circle(c, x, y, r, fill) { c.beginPath(); c.arc(x, y, r, 0, Math.PI * 2); c.fillStyle = fill; c.fill(); }
+function poly(c, pts, fill) {
+  c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) c.lineTo(pts[i][0], pts[i][1]);
+  c.closePath(); c.fillStyle = fill; c.fill();
+}
+function rr(c, x, y, w, h, r) {
+  c.beginPath(); c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+}
+function star(c, cx, cy, R, r, fill) {
+  c.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const rad = i % 2 === 0 ? R : r, a = -Math.PI / 2 + i * Math.PI / 5;
+    c.lineTo(cx + rad * Math.cos(a), cy + rad * Math.sin(a));
+  }
+  c.closePath(); c.fillStyle = fill; c.fill();
+}
+function cloud(c, x, y, s, fill) {
+  c.fillStyle = fill; c.beginPath();
+  c.arc(x, y, 10 * s, 0, Math.PI * 2); c.arc(x + 12 * s, y - 6 * s, 13 * s, 0, Math.PI * 2);
+  c.arc(x + 26 * s, y, 10 * s, 0, Math.PI * 2); c.fill();
+  c.fillRect(x, y - 2 * s, 26 * s, 10 * s);
+}
+
+/* ---------- the 8 artworks ---------- */
+const arts = [
+
+{ name: "1. Rocket", draw(c) {
+  bg(c, "#1E2A4A");
+  [[25,30,2],[165,25,2.5],[30,120,1.5],[170,110,2],[150,170,1.5],[50,175,2],[120,20,1.5]].forEach(s => circle(c, s[0], s[1], s[2], "#FFF3B0"));
+  star(c, 160, 60, 7, 3, "#FFD166");
+  // fins
+  poly(c, [[70,105],[42,150],[70,140]], "#EF476F");
+  poly(c, [[130,105],[158,150],[130,140]], "#EF476F");
+  // flame
+  c.beginPath(); c.moveTo(84,142); c.quadraticCurveTo(100,200,116,142); c.closePath(); c.fillStyle = "#FF9F1C"; c.fill();
+  c.beginPath(); c.moveTo(92,142); c.quadraticCurveTo(100,176,108,142); c.closePath(); c.fillStyle = "#FFE066"; c.fill();
+  // body
+  c.beginPath(); c.moveTo(100,22); c.bezierCurveTo(132,48,136,92,130,142); c.lineTo(70,142); c.bezierCurveTo(64,92,68,48,100,22); c.closePath();
+  c.fillStyle = "#F4F1F0"; c.fill();
+  c.save(); c.clip(); c.fillStyle = "#EF476F"; c.fillRect(60, 0, 80, 56); c.fillStyle = "#C9CED6"; c.fillRect(60, 126, 80, 16); c.restore();
+  // window
+  circle(c, 100, 84, 14, "#EF476F"); circle(c, 100, 84, 10, "#4FC3F7");
+  c.beginPath(); c.arc(96, 80, 3, 0, Math.PI * 2); c.fillStyle = "rgba(255,255,255,.7)"; c.fill();
+}},
+
+{ name: "2. Sailboat", draw(c) {
+  bg(c, "#BFE6F5");
+  circle(c, 158, 44, 20, "#FFD166");
+  cloud(c, 25, 50, 1, "#FFFFFF");
+  c.fillStyle = "#2A9D8F"; c.fillRect(0, 140, 200, 60);
+  // mast + sails
+  c.fillStyle = "#5B3A29"; c.fillRect(98, 34, 4, 104);
+  poly(c, [[104,42],[104,126],[152,126]], "#FFFFFF");
+  poly(c, [[96,58],[96,126],[52,126]], "#F4A261");
+  poly(c, [[102,34],[102,50],[120,42]], "#E63946");
+  // hull
+  poly(c, [[42,132],[158,132],[136,162],[64,162]], "#8C5A3C");
+  c.fillStyle = "#6B4226"; c.fillRect(46, 138, 108, 5);
+  // waves
+  c.strokeStyle = "rgba(255,255,255,.75)"; c.lineWidth = 3; c.lineCap = "round";
+  for (let r = 0; r < 2; r++) for (let i = 0; i < 5; i++) {
+    c.beginPath(); c.arc(18 + i * 40 + r * 20, 172 + r * 14, 10, Math.PI, 0); c.stroke();
+  }
+}},
+
+{ name: "3. House", draw(c) {
+  bg(c, "#FDE8C9");
+  c.fillStyle = "#8BC34A"; c.fillRect(0, 150, 200, 50);
+  // chimney, walls, roof
+  c.fillStyle = "#8D5B4C"; c.fillRect(132, 48, 15, 36);
+  c.fillStyle = "#F6C28B"; c.fillRect(45, 90, 110, 64);
+  poly(c, [[32,94],[100,38],[168,94]], "#C8553D");
+  poly(c, [[52,94],[100,54],[148,94]], "#D9694F");
+  // door
+  rr(c, 88, 112, 24, 42, 3); c.fillStyle = "#6B4226"; c.fill();
+  circle(c, 106, 134, 2.5, "#FFD166");
+  // windows
+  [[54,106],[124,106]].forEach(w => {
+    c.fillStyle = "#A8DADC"; c.fillRect(w[0], w[1], 22, 22);
+    c.strokeStyle = "#FFFFFF"; c.lineWidth = 3; c.strokeRect(w[0], w[1], 22, 22);
+    c.beginPath(); c.moveTo(w[0] + 11, w[1]); c.lineTo(w[0] + 11, w[1] + 22); c.moveTo(w[0], w[1] + 11); c.lineTo(w[0] + 22, w[1] + 11); c.stroke();
+  });
+  // bushes + path
+  circle(c, 38, 154, 12, "#4C9A2A"); circle(c, 164, 154, 12, "#4C9A2A");
+  poly(c, [[90,154],[110,154],[120,200],[80,200]], "#E9D5A1");
+  cloud(c, 22, 30, 0.9, "#FFFFFF");
+}},
+
+{ name: "4. Hot Air Balloon", draw(c) {
+  bg(c, "#A9DEF9");
+  cloud(c, 20, 160, 1.2, "#FFFFFF"); cloud(c, 140, 40, 0.9, "#FFFFFF");
+  // envelope with stripes
+  c.save();
+  c.beginPath(); c.moveTo(88,130); c.bezierCurveTo(28,102,38,24,100,24); c.bezierCurveTo(162,24,172,102,112,130); c.closePath(); c.clip();
+  const cols = ["#EF476F","#FFD166","#06D6A0","#118AB2","#EF476F","#FFD166"];
+  cols.forEach((col, i) => { c.fillStyle = col; c.fillRect(36 + i * 21, 0, 21, 140); });
+  c.restore();
+  // shading highlight
+  c.beginPath(); c.ellipse(78, 60, 8, 20, -0.3, 0, Math.PI * 2); c.fillStyle = "rgba(255,255,255,.3)"; c.fill();
+  // ropes + basket
+  c.strokeStyle = "#5B3A29"; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(88,130); c.lineTo(89,152); c.moveTo(112,130); c.lineTo(111,152); c.stroke();
+  rr(c, 86, 152, 28, 22, 4); c.fillStyle = "#A9744F"; c.fill();
+  c.strokeStyle = "#8C5A3C"; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(86,162); c.lineTo(114,162); c.stroke();
+}},
+
+{ name: "5. Fish", draw(c) {
+  const g = c.createLinearGradient(0, 0, 0, 200); g.addColorStop(0, "#1D6FA5"); g.addColorStop(1, "#0B3C5D");
+  c.fillStyle = g; c.fillRect(0, 0, 200, 200);
+  // bubbles
+  c.strokeStyle = "rgba(255,255,255,.6)"; c.lineWidth = 2;
+  [[40,60,6],[52,40,4],[30,35,3],[160,160,5],[172,140,3]].forEach(b => { c.beginPath(); c.arc(b[0], b[1], b[2], 0, Math.PI * 2); c.stroke(); });
+  // tail + fins
+  poly(c, [[140,100],[184,66],[184,134]], "#FF6B35");
+  c.beginPath(); c.moveTo(72,72); c.quadraticCurveTo(100,30,124,72); c.closePath(); c.fillStyle = "#FF6B35"; c.fill();
+  c.beginPath(); c.moveTo(90,128); c.quadraticCurveTo(100,160,122,130); c.closePath(); c.fillStyle = "#FF6B35"; c.fill();
+  // body with stripes
+  c.save();
+  c.beginPath(); c.ellipse(95, 100, 56, 36, 0, 0, Math.PI * 2); c.fillStyle = "#FF9F43"; c.fill(); c.clip();
+  c.fillStyle = "rgba(255,255,255,.85)"; c.fillRect(96, 55, 12, 90); c.fillRect(120, 55, 8, 90);
+  c.restore();
+  // eye + mouth
+  circle(c, 66, 92, 8, "#FFFFFF"); circle(c, 64, 92, 4, "#1B1B1B");
+  c.strokeStyle = "#B5541C"; c.lineWidth = 2.5; c.lineCap = "round";
+  c.beginPath(); c.arc(52, 106, 8, 0.2, 1.2); c.stroke();
+}},
+
+{ name: "6. Pine Tree", draw(c) {
+  bg(c, "#FFE3CF");
+  circle(c, 160, 44, 18, "#FFB703");
+  c.fillStyle = "#F7F3EE"; c.beginPath(); c.ellipse(100, 186, 110, 28, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = "#6D4C41"; c.fillRect(92, 150, 16, 34);
+  poly(c, [[100,76],[160,156],[40,156]], "#2D6A4F");
+  poly(c, [[100,48],[152,120],[48,120]], "#40916C");
+  poly(c, [[100,24],[142,86],[58,86]], "#52B788");
+  star(c, 100, 22, 12, 5, "#FFD166");
+  [[84,140,"#EF476F"],[120,146,"#FFD166"],[70,110,"#FFD166"],[128,108,"#EF476F"],[100,76,"#EF476F"],[92,56,"#FFD166"]].forEach(o => circle(c, o[0], o[1], 4, o[2]));
+}},
+
+{ name: "7. Umbrella", draw(c) {
+  bg(c, "#CFE5EF");
+  // rain
+  c.strokeStyle = "#7FB3CE"; c.lineWidth = 2; c.lineCap = "round";
+  [[20,20],[55,40],[150,15],[180,50],[30,110],[170,120],[15,170],[185,175],[60,185],[140,180]].forEach(p => {
+    c.beginPath(); c.moveTo(p[0], p[1]); c.lineTo(p[0] - 4, p[1] + 12); c.stroke();
+  });
+  // canopy wedges
+  const cx = 100, cy = 100, R = 72;
+  for (let i = 0; i < 6; i++) {
+    c.beginPath(); c.moveTo(cx, cy);
+    c.arc(cx, cy, R, Math.PI + i * Math.PI / 6, Math.PI + (i + 1) * Math.PI / 6);
+    c.closePath(); c.fillStyle = i % 2 ? "#FFF1E6" : "#E63946"; c.fill();
+  }
+  // scalloped edge
+  for (let i = 0; i < 3; i++) {
+    const x = 28 + i * 48; // 3 scallops across 144px
+    c.beginPath(); c.arc(x + 24, cy, 24, 0, Math.PI);
+    c.fillStyle = i % 2 ? "#FFF1E6" : "#E63946"; c.fill();
+  }
+  c.fillStyle = "#E63946"; // tidy small tip
+  c.beginPath(); c.arc(100, 26, 4, 0, Math.PI * 2); c.fill();
+  // handle
+  c.strokeStyle = "#3D405B"; c.lineWidth = 5; c.lineCap = "round";
+  c.beginPath(); c.moveTo(100, 120); c.lineTo(100, 160); c.arc(111, 160, 11, Math.PI, 0, true); c.stroke();
+}},
+
+{ name: "8. Sun and Cloud", draw(c) {
+  const g = c.createLinearGradient(0, 0, 0, 200); g.addColorStop(0, "#5BB8F0"); g.addColorStop(1, "#BDE6FA");
+  c.fillStyle = g; c.fillRect(0, 0, 200, 200);
+  // sun rays
+  c.save(); c.translate(75, 75); c.strokeStyle = "#FFB703"; c.lineWidth = 6; c.lineCap = "round";
+  for (let i = 0; i < 12; i++) {
+    c.rotate(Math.PI / 6); c.beginPath(); c.moveTo(42, 0); c.lineTo(58, 0); c.stroke();
+  }
+  c.restore();
+  circle(c, 75, 75, 34, "#FFD23F");
+  circle(c, 66, 66, 10, "rgba(255,255,255,.35)");
+  // cloud
+  c.save(); c.shadowColor = "rgba(30,90,140,.25)"; c.shadowBlur = 10; c.shadowOffsetY = 6;
+  c.fillStyle = "#FFFFFF"; c.beginPath();
+  c.arc(98, 138, 24, 0, Math.PI * 2); c.arc(128, 122, 31, 0, Math.PI * 2); c.arc(158, 140, 22, 0, Math.PI * 2); c.fill();
+  rr(c, 78, 136, 104, 28, 14); c.fill();
+  c.restore();
+  cloud(c, 130, 36, 0.8, "rgba(255,255,255,.85)");
+}}
+
+];
+
+/* ---------- build the page ---------- */
+const gallery = document.getElementById("gallery");
+arts.forEach(a => {
+  const fig = document.createElement("figure");
+  const cv = document.createElement("canvas");
+  cv.width = 200; cv.height = 200;
+  cv.setAttribute("role", "img"); cv.setAttribute("aria-label", a.name.replace(/^\d+\.\s*/, ""));
+  const cap = document.createElement("figcaption"); cap.textContent = a.name;
+  fig.append(cv, cap); gallery.append(fig);
+  a.draw(cv.getContext("2d"));
+});
+</script>
+</body>
+</html>
